@@ -1,0 +1,13 @@
+{{>header}}
+import jester
+import json
+import logging
+
+import config
+
+# Models
+{{#models}}{{#model}}import {{packageName}}/models/{{classFilename}}
+{{/model}}{{/models}}
+
+let logger = newConsoleLogger()
+addHandler(logger)

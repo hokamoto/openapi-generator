@@ -43,11 +43,12 @@ public class NimJesterServerCodegen extends DefaultCodegen implements CodegenCon
 
         outputFolder = "generated-code" + File.separator + "nim-jester-server";
         modelTemplateFiles.put("model.mustache", ".nim");
-        apiTemplateFiles.put("api.mustache", ".nim");
+        apiTemplateFiles.clear();
         embeddedTemplateDir = templateDir = "nim-jester-server";
-        apiPackage = File.separator + "Apis";
         modelPackage = File.separator + "Models";
         supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
+        supportingFiles.add(new SupportingFile("sample_server.mustache", "", "sample_server.nim"));
+        supportingFiles.add(new SupportingFile("config.mustache", "", "config.nim"));
 
         setReservedWordsLowerCase(
                 Arrays.asList(
@@ -147,9 +148,7 @@ public class NimJesterServerCodegen extends DefaultCodegen implements CodegenCon
         additionalProperties.put(CodegenConstants.PACKAGE_NAME, packageName);
         additionalProperties.put(CodegenConstants.PACKAGE_VERSION, packageVersion);
 
-        apiPackage = File.separator + packageName + File.separator + "apis";
         modelPackage = File.separator + packageName + File.separator + "models";
-        supportingFiles.add(new SupportingFile("lib.mustache", "", packageName + ".nim"));
     }
 
     @Override
