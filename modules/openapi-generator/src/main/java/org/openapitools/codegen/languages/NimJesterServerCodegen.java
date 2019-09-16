@@ -43,9 +43,10 @@ public class NimJesterServerCodegen extends DefaultCodegen implements CodegenCon
 
         outputFolder = "generated-code" + File.separator + "nim-jester-server";
         modelTemplateFiles.put("model.mustache", ".nim");
-        apiTemplateFiles.clear();
+        apiTemplateFiles.put("api.mustache", ".nim");
         embeddedTemplateDir = templateDir = "nim-jester-server";
-        modelPackage = File.separator + "Models";
+        apiPackage = File.separator + "apis";
+        modelPackage = File.separator + "models";
         supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
         supportingFiles.add(new SupportingFile("sample_server.mustache", "", "sample_server.nim"));
         supportingFiles.add(new SupportingFile("config.mustache", "", "config.nim"));
@@ -147,8 +148,6 @@ public class NimJesterServerCodegen extends DefaultCodegen implements CodegenCon
 
         additionalProperties.put(CodegenConstants.PACKAGE_NAME, packageName);
         additionalProperties.put(CodegenConstants.PACKAGE_VERSION, packageVersion);
-
-        modelPackage = File.separator + packageName + File.separator + "models";
     }
 
     @Override
@@ -215,12 +214,15 @@ public class NimJesterServerCodegen extends DefaultCodegen implements CodegenCon
 
     @Override
     public Map<String, Object> postProcessOperationsWithModels(Map<String, Object> objs, List<Object> allModels) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> objectMap = (Map<String, Object>) objs.get("operations");
-        @SuppressWarnings("unchecked")
-        List<CodegenOperation> operations = (List<CodegenOperation>) objectMap.get("operation");
-        for (CodegenOperation operation : operations) {
-            operation.httpMethod = operation.httpMethod.toLowerCase(Locale.ROOT);
+        objs = super.postProcessOperationsWithModels(objs, allModels);
+
+        Map<String, Object> operations = (Map<String, Object>) objs.get("operations");
+        List<CodegenOperation> operationList = (List<CodegenOperation>) operations.get("operation");
+        for (CodegenOperation op : operationList) {
+            if (op.path != null) {
+                op.path = op.path.replaceAll("\\{(.*?)\\}", "@$1");
+            }
+            op.httpMethod = op.httpMethod.toLowerCase();
         }
 
         return objs;

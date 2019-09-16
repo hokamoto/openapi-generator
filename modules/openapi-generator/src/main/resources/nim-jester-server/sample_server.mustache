@@ -5,9 +5,27 @@ import logging
 
 import config
 
-# Models
-{{#models}}{{#model}}import {{packageName}}/models/{{classFilename}}
-{{/model}}{{/models}}
+# APIs
+{{#apiInfo}}{{#apis}}import apis/{{classFilename}}
+{{/apis}}{{/apiInfo}}
 
 let logger = newConsoleLogger()
 addHandler(logger)
+
+
+proc main() =
+  var jester = initJester(settings = newSettings(
+      port = config.port,
+      staticDir = config.staticDir,
+      appName = config.appName,
+      bindAddr = config.bindAddr,
+      reusePort = config.reusePort
+     )
+  )
+
+{{#apiInfo}}{{#apis}}  jester.register({{classFilename}}.router)
+{{/apis}}{{/apiInfo}}
+  jester.serve()
+
+when isMainModule:
+  main()
